@@ -1,9 +1,9 @@
 import { useRef } from "react";
-
+import PropTypes from "prop-types";
 import Card from "../ui/Card";
 import classes from "./NewMeetupForm.module.css";
 
-function NewMeetupForm(props) {
+function NewMeetupForm({ onAddMeetup }) {
   const titleInputRef = useRef();
   const imageInputRef = useRef();
   const addressInputRef = useRef();
@@ -24,7 +24,7 @@ function NewMeetupForm(props) {
       description: enteredDescription,
     };
 
-    props.onAddMeetup(meetupData);
+    onAddMeetup(meetupData);
   }
 
   return (
@@ -58,5 +58,9 @@ function NewMeetupForm(props) {
     </Card>
   );
 }
+
+NewMeetupForm.propTypes = {
+  onAddMeetup: PropTypes.func.isRequired,
+};
 
 export default NewMeetupForm;
