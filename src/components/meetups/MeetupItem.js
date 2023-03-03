@@ -4,13 +4,19 @@ import PropTypes from "prop-types";
 import { useContext } from "react";
 import FavoritesContext from "../../store/favorites-context";
 
-function MeetupItem({ address, description, id, image, key, title }) {
+function MeetupItem({ address, description, id, image, title }) {
   const favoritesCtx = useContext(FavoritesContext);
   const itemIsFavorite = favoritesCtx.itemIsFavorite(id);
 
   function toggleFavoriteStatusHandler() {
     if (itemIsFavorite) {
-      favoritesCtx.removeFavorite(id);
+      favoritesCtx.removeFavorite({
+        id: id,
+        title: title,
+        description: description,
+        image: image,
+        address: address,
+      });
     } else {
       favoritesCtx.addFavorite({
         id: id,
@@ -48,7 +54,6 @@ MeetupItem.propTypes = {
   description: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,
-  key: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
 };
 

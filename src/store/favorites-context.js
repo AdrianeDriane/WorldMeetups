@@ -12,16 +12,66 @@ const FavoritesContext = createContext({
 export function FavoritesContextProvider({ children }) {
   const [userFavorites, setUserFavorites] = useState([]);
 
-  function addFavoriteHandler(favoriteMeetup) {
-    setUserFavorites((prevUserFavorites) => {
-      return prevUserFavorites.concat(favoriteMeetup);
+  fetch("https://reactmeetup-ce733-default-rtdb.firebaseio.com/favorites.json")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const favMeetups = [];
+
+      for (const key in data) {
+        const faveMeetup = {
+          id: key,
+          ...data[key],
+        };
+
+        favMeetups.push(faveMeetup);
+      }
+
+      setUserFavorites(favMeetups);
     });
+
+  function addFavoriteHandler(favoriteMeetup) {
+    fetch(
+      "https://reactmeetup-ce733-default-rtdb.firebaseio.com/favorites.json",
+      {
+        method: "POST",
+        body: JSON.stringify(favoriteMeetup),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 
-  function removeFavoriteHandler(meetupId) {
-    setUserFavorites((prevUserFavorites) => {
-      return prevUserFavorites.filter((meetup) => meetup.id !== meetupId);
-    });
+  function removeFavoriteHandler(favoriteMeetup) {
+    fetch(
+      "https://reactmeetup-ce733-default-rtdb.firebaseio.com/favorites.json",
+      {
+        method: "GET",
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Failed to fetch favorites.");
+      })
+      .then((data) => {
+        for (const key in data) {
+          if (data[key].id === favoriteMeetup.id) {
+            fetch(
+              `https://reactmeetup-ce733-default-rtdb.firebaseio.com/favorites/${key}.json`,
+              {
+                method: "DELETE",
+              }
+            );
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   function itemIsFavoriteHandler(meetupId) {
